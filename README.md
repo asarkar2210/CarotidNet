@@ -1,5 +1,4 @@
-
-<img width="2816" height="1536" alt="Gemini_Generated_Image_v9aj78v9aj78v9aj" src="https://github.com/user-attachments/assets/e0e3a5c1-6b0c-480c-b665-740e26f5bdc4" />
+<img width="2816" height="1536" alt="Gemini_Generated_Image_v9aj78v9aj78v9aj" src="https://github.com/user-attachments/assets/54637fc2-afc0-4745-b7b2-1bd0d9e6c1bc" />
 
 # CarotidNet: Multimodal Stroke Risk Predictor
 
