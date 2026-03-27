@@ -7,11 +7,11 @@ from PIL import Image
 
 st.set_page_config(page_title="CarotidNet", layout="wide", page_icon="logo.png")
 
-# --- CONFIGURATION ---
+
 MODEL_PATH = 'final_multimodal_model.h5'
 SCALER_PATH = 'scaler.pkl'
 
-# --- LOAD ASSETS (Cached for speed) ---
+
 @st.cache_resource
 def load_assets():
     model = tf.keras.models.load_model(MODEL_PATH)
@@ -24,7 +24,7 @@ except Exception as e:
     st.error(f"Error loading files: {e}")
     st.stop()
 
-# --- UI DESIGN ---
+
 col_logo, col_title = st.columns([1, 15])
 
 with col_logo:
@@ -40,7 +40,7 @@ st.markdown("### Multimodal Stroke Risk Predictor")
 
 col1, col2 = st.columns(2)
 
-# --- LEFT COLUMN: CLINICAL DATA ---
+
 with col1:
     st.header("1. Patient Vitals")
     age = st.number_input("Age", min_value=1, max_value=100, value=65)
@@ -51,7 +51,7 @@ with col1:
     hypertension = st.selectbox("Hypertension?", ["No", "Yes"])
     heart_disease = st.selectbox("Heart Disease?", ["No", "Yes"])
     
-    # Text to Number Conversion
+
     hyp_val = 1 if hypertension == "Yes" else 0
     hd_val = 1 if heart_disease == "Yes" else 0
     
@@ -59,31 +59,28 @@ with col1:
     gender = st.selectbox("Gender", ["Male", "Female"])
     smoking = st.selectbox("Smoking Status", ["never smoked", "formerly smoked", "smokes", "Unknown"])
     
-    # Note: For the demo, we feed dummy values for complex categoricals 
-    # to match the 10 input columns the model expects.
-    # The crucial predictors (Age, BMI, Glucose, Heart) are real.
 
-# --- RIGHT COLUMN: IMAGE UPLOAD ---
+
 with col2:
     st.header("2. Ultrasound Scan")
     uploaded_file = st.file_uploader("Upload Carotid Ultrasound (TIFF/JPG)", type=["tiff", "tif", "jpg", "png"])
     
     if uploaded_file is not None:
-        # Display Image
+        
         image = Image.open(uploaded_file)
         st.image(image, caption="Uploaded Scan")
         
-        # Preprocess Image
+        
         img_array = np.array(image.convert('RGB'))
         img_array = cv2.resize(img_array, (224, 224))
         img_array = img_array / 255.0  # Normalize
         img_array = np.expand_dims(img_array, axis=0)  # Batch shape (1, 224, 224, 3)
     else:
-        # Placeholder Grey Box
+        
         placeholder = np.full((300, 400, 3), 220, dtype=np.uint8)
         st.image(placeholder, caption="No Scan Uploaded", use_column_width=True)
 
-# --- PREDICTION LOGIC ---
+
 st.write("") 
 _, col_btn, _ = st.columns([1, 2, 1])
 
@@ -91,22 +88,17 @@ if col_btn.button("Analyse Risk", type="primary", use_container_width=True):
     if uploaded_file is None:
         st.warning("⚠️ Please upload an ultrasound image first.")
     else:
-        # 1. Prepare Tabular Data (Order must match training!)
-        # Features: ['age', 'hypertension', 'heart_disease', 'avg_glucose_level', 'bmi', 
-        #            'gender', 'ever_married', 'work_type', 'Residence_type', 'smoking_status']
-        
-        # We use dummy codes (0) for the less important categoricals to keep the demo simple
-        # logic: [age, hyp, heart, gluc, bmi, gen_code, mar_code, work_code, res_code, smk_code]
+
         raw_data = np.array([[age, hyp_val, hd_val, glucose, bmi, 0, 1, 2, 1, 1]])
         
-        # Scale the data using the saved scaler
+
         scaled_data = scaler.transform(raw_data)
         
-        # 2. Predict
+
         prediction = model.predict([img_array, scaled_data])
         risk_score = float(prediction[0][0])
         
-        # 3. Display Result
+
         st.divider()
         st.markdown(f"<h2 style='text-align: center;'>Predicted Stroke Risk: <strong>{risk_score*100:.2f}%</strong></h2>", unsafe_allow_html=True)
         
