@@ -144,7 +144,7 @@ Training notebooks are provided in the `notebooks/` directory:
 If you use this work, please cite:
 ```
 CarotidNet: Multimodal Stroke Risk Predictor
-https://github.com/asarkar2210/CarotidNet---Multimodal-Stroke-Risk-Predictor
+https://github.com/asarkar2210/CarotidNet
 ```
 
 ---
